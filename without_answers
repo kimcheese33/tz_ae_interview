@@ -1,0 +1,98 @@
+----------------------------------------
+-------- TheParrot File Structure ------
+----------------------------------------
+
+--     the_parrot_analytics/
+--        |
+--        |--  queries/
+--              |
+--              |--  1_activity_count.sql
+--              |--  2_user_info.sql
+--              |--  3_user_activity.sql
+--              |--  4_user_revenue.sql
+
+
+
+----------------------------------------
+---------- 1_activity_count.sql --------
+----------------------------------------
+
+SELECT
+    a.user_id
+    , count(*) AS website_visits
+
+FROM activity AS a
+WHERE a.event_timestamp >= '2020-01-01'
+    AND a.event_timestamp < '2020-02-01'
+    AND a.age > 25
+    AND a.state = 'tx'
+GROUP BY a.user_id
+
+----------------------------------------
+---------- 2_user_info.sql -------------
+----------------------------------------
+
+SELECT
+    u.id
+    , u.first_name + u.last_name AS user_name
+    , u.email
+
+FROM user AS u
+WHERE u.age > 25
+    AND u.state = 'tx'
+
+----------------------------------------
+---------- 3_user_activity.sql -----------
+----------------------------------------
+
+SELECT
+    ui.id AS user_id
+    , ui.first_name
+    , ui.email
+    , ac.website_visits
+
+FROM 2_user_info AS ui
+    LEFT JOIN activity_count AS ac
+        ON ui.id = ac.user_id
+
+
+----------------------------------------
+---------- 4_user_revenue.sql ----------
+----------------------------------------
+
+SELECT
+    tpd.user_id
+    , SUM(tpd.revenue)
+FROM third_party_data AS tpd
+GROUP BY tpd.user_id
+
+----------------------------------------
+----------------------------------------
+
+---------------- Prompt ----------------
+We are a new company called TheParrot. We are just setting up our analytics workflow. Our analyst has come to us
+with the first queries that we want to productionalize. She has given you 4 queries that she created. Our VP of data
+wants to use DBT because it is maintainable and scalable.
+
+A basic repository structure is given to you showing the 4 queries the analyst has passed to you.
+As shown in the diagram these sql queries are all separate files in your analytics repository.
+
+
+
+1. Take these queries and make the changes to them that are needed to make them part of an existing DBT project:
+    - Update table names with source/ref syntax
+    - "Add" a sources.yml file:
+    
+       ---------- TheParrot/sources.yml -------
+            version: 2
+
+            sources:
+
+
+2. Now that you have added these projects to a DBT project you want to add a macro. What code from the above queries could be converted to a macro? What kind of code do we look to convert to macros?
+
+
+3. Write the macro, and implement in the existing queries.
+
+
+4. Alter the macro to take age as an input, because now we want to change the age in the future as our company changes.
